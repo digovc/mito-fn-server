@@ -1,7 +1,12 @@
-﻿namespace MultiplayerServer.Packets
+﻿namespace Packets
 {
-    public class MovePacket
+    public class Move
     {
+        public byte GlobalID
+        {
+            get; set;
+        }
+
         public float X
         {
             get; set;

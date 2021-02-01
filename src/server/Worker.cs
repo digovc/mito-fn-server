@@ -11,6 +11,7 @@ namespace MultiplayerServer
     public class Worker : BackgroundService
     {
         private readonly IUdpListener listener;
+        private readonly IPlayerManager playerManager;
         private readonly ILogger<Worker> logger;
         private readonly IUdpProcessor processor;
         private readonly IUdpServer server;
@@ -19,12 +20,14 @@ namespace MultiplayerServer
         public Worker(
             ILogger<Worker> logger,
             IUdpListener listener,
+            IPlayerManager playerManager,
             IUdpProcessor processor,
             IUdpServer server
             )
         {
             this.logger = logger;
             this.listener = listener;
+            this.playerManager = playerManager;
             this.processor = processor;
             this.server = server;
         }
@@ -47,9 +50,10 @@ namespace MultiplayerServer
 
         private void Init()
         {
-            server.Init();
             listener.Init();
+            server.Init();
             processor.Init();
+            playerManager.Init();
 
             InitTickers();
         }

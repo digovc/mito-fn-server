@@ -1,20 +1,27 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
 using MultiplayerServer.Abstractions;
-using MultiplayerServer.Packets;
-using System;
+using Packets;
 
 namespace MultiplayerServer.Services
 {
     public class UdpProcessor : IUdpProcessor
     {
+        private readonly IPacketBroadcaster broadcaster;
+
         private NetPacketProcessor _processor;
+
+        public UdpProcessor(IPacketBroadcaster broadcaster)
+        {
+            this.broadcaster = broadcaster;
+        }
 
         void IUdpProcessor.Init()
         {
             _processor = new NetPacketProcessor();
 
-            _processor.SubscribeReusable<MovePacket, NetPeer>(MoveEvent);
+            _processor.SubscribeReusable<LoginRequest, NetPeer>(broadcaster.Login);
+            _processor.SubscribeReusable<Move, NetPeer>(broadcaster.Move);
         }
 
         void IUdpProcessor.ReadPackets(NetPeer peer, NetPacketReader reader)
@@ -22,9 +29,9 @@ namespace MultiplayerServer.Services
             _processor.ReadAllPackets(reader, peer);
         }
 
-        private void MoveEvent(MovePacket packet, NetPeer peer)
+        byte[] IUdpProcessor.Write<T>(T packet)
         {
-            throw new NotImplementedException();
+            return _processor.Write(packet);
         }
     }
 }

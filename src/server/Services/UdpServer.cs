@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using MultiplayerServer.Abstractions;
+using System.Collections.Generic;
 
 namespace MultiplayerServer.Services
 {
@@ -11,6 +12,11 @@ namespace MultiplayerServer.Services
         public UdpServer(IUdpListener listener)
         {
             this.listener = listener;
+        }
+
+        IEnumerable<NetPeer> IUdpServer.GetAllPeers()
+        {
+            return _server.ConnectedPeerList;
         }
 
         void IUdpServer.Init()

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MultiplayerServer.Abstractions;
+using MultiplayerServer.Game;
 using MultiplayerServer.Services;
 
 namespace MultiplayerServer
@@ -10,9 +11,13 @@ namespace MultiplayerServer
         {
             services.AddHostedService<Worker>();
 
+            services.AddSingleton<IPacketBroadcaster, PacketBroadcaster>();
+            services.AddSingleton<IPlayerManager, PlayerManager>();
             services.AddSingleton<IUdpListener, UdpListener>();
             services.AddSingleton<IUdpProcessor, UdpProcessor>();
             services.AddSingleton<IUdpServer, UdpServer>();
+
+            services.AddTransient<ISender, Sender>();
         }
     }
 }
