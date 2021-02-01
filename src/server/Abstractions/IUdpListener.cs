@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using System;
 
 namespace MultiplayerServer.Abstractions
 {
@@ -7,5 +8,7 @@ namespace MultiplayerServer.Abstractions
         EventBasedNetListener GetListener();
 
         void Init();
+
+        event EventHandler<NetPeer> OnDisconnect;
     }
 }

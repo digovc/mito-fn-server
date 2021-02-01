@@ -13,17 +13,20 @@ namespace MultiplayerServer.Game
     {
         private readonly IPacketBroadcaster broadcaster;
         private readonly IConfiguration configuration;
+        private readonly IUdpListener listener;
         private readonly ISender sender;
         private List<Player> _players;
 
         public PlayerManager(
             IPacketBroadcaster broadcaster,
             IConfiguration configuration,
+            IUdpListener listener,
             ISender sender
             )
         {
             this.broadcaster = broadcaster;
             this.configuration = configuration;
+            this.listener = listener;
             this.sender = sender;
         }
 
@@ -33,6 +36,13 @@ namespace MultiplayerServer.Game
 
             broadcaster.OnLogin += Login;
             broadcaster.OnMove += Move;
+
+            listener.OnDisconnect += Disconnect;
+        }
+
+        private void Disconnect(object sender, NetPeer peer)
+        {
+            _players.RemoveAll(x => x.Peer == peer);
         }
 
         private byte GetMaxPlayers()
@@ -58,6 +68,7 @@ namespace MultiplayerServer.Game
             var player = new Player
             {
                 GlobalID = globalID,
+                Peer = peer as NetPeer,
                 Position = new Vector3(),
             };
 

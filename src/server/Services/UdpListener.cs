@@ -1,6 +1,7 @@
 ﻿using LiteNetLib;
 using Microsoft.Extensions.Configuration;
 using MultiplayerServer.Abstractions;
+using System;
 
 namespace MultiplayerServer.Services
 {
@@ -63,6 +64,9 @@ namespace MultiplayerServer.Services
         private void PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
             _peersCount--;
+            OnDisconnect?.Invoke(this, peer);
         }
+
+        public event EventHandler<NetPeer> OnDisconnect;
     }
 }
