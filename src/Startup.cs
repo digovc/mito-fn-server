@@ -9,6 +9,9 @@ namespace MultiplayerServer
         internal static void CondigureServices(IServiceCollection services)
         {
             services.AddHostedService<Worker>();
+
+            services.AddSingleton<IUdpListener, UdpListener>();
+            services.AddSingleton<IUdpProcessor, UdpProcessor>();
             services.AddSingleton<IUdpServer, UdpServer>();
         }
     }

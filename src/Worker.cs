@@ -10,17 +10,23 @@ namespace MultiplayerServer
 {
     public class Worker : BackgroundService
     {
+        private readonly IUdpListener listener;
         private readonly ILogger<Worker> logger;
-        private readonly IUdpServer udpServer;
+        private readonly IUdpProcessor processor;
+        private readonly IUdpServer server;
         private List<ITicker> tickers;
 
         public Worker(
             ILogger<Worker> logger,
-            IUdpServer udpServer
+            IUdpListener listener,
+            IUdpProcessor processor,
+            IUdpServer server
             )
         {
             this.logger = logger;
-            this.udpServer = udpServer;
+            this.listener = listener;
+            this.processor = processor;
+            this.server = server;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -36,12 +42,14 @@ namespace MultiplayerServer
 
         private static async Task Delay(CancellationToken stoppingToken)
         {
-            await Task.Delay(15, stoppingToken);
+            await Task.Delay(65, stoppingToken);
         }
 
         private void Init()
         {
-            udpServer.Init();
+            server.Init();
+            listener.Init();
+            processor.Init();
 
             InitTickers();
         }
@@ -50,7 +58,7 @@ namespace MultiplayerServer
         {
             tickers = new List<ITicker>
             {
-                udpServer
+                server
             };
         }
 
