@@ -10,26 +10,32 @@ namespace MultiplayerServer
 {
     public class Worker : BackgroundService
     {
+        private readonly IGameManager gameManager;
         private readonly IUdpListener listener;
-        private readonly IPlayerManager playerManager;
         private readonly ILogger<Worker> logger;
+        private readonly IPlayerManager playerManager;
         private readonly IUdpProcessor processor;
         private readonly IUdpServer server;
+        private readonly ISyncManager syncManager;
         private List<ITicker> tickers;
 
         public Worker(
+            IGameManager gameManager,
             ILogger<Worker> logger,
             IUdpListener listener,
             IPlayerManager playerManager,
             IUdpProcessor processor,
-            IUdpServer server
+            IUdpServer server,
+            ISyncManager syncManager
             )
         {
+            this.gameManager = gameManager;
             this.logger = logger;
             this.listener = listener;
             this.playerManager = playerManager;
             this.processor = processor;
             this.server = server;
+            this.syncManager = syncManager;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -53,7 +59,9 @@ namespace MultiplayerServer
             listener.Init();
             server.Init();
             processor.Init();
+            gameManager.Init();
             playerManager.Init();
+            syncManager.Init();
 
             InitTickers();
         }

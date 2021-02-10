@@ -11,8 +11,10 @@ namespace MultiplayerServer
         {
             services.AddHostedService<Worker>();
 
+            services.AddSingleton<IGameManager, GameManager>();
             services.AddSingleton<IPacketBroadcaster, PacketBroadcaster>();
             services.AddSingleton<IPlayerManager, PlayerManager>();
+            services.AddSingleton<ISyncManager, SyncManager>();
             services.AddSingleton<IUdpListener, UdpListener>();
             services.AddSingleton<IUdpProcessor, UdpProcessor>();
             services.AddSingleton<IUdpServer, UdpServer>();

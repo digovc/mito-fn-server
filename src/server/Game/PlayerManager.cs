@@ -34,8 +34,16 @@ namespace MultiplayerServer.Game
         {
             _players = new List<Player>();
 
+            broadcaster.OnFinishGame += FinishGame_;
             broadcaster.OnLogin += Login;
             broadcaster.OnMove += Move;
+            broadcaster.OnPlayerInAssembly += InAssembly;
+            broadcaster.OnPlayerInfected += Infect;
+            broadcaster.OnPlayerKilled += Kill;
+            broadcaster.OnPlayerOutOfAssembly += OutAssembly;
+            broadcaster.OnPlayerPoisoned += Poisoned;
+            broadcaster.OnRotate += Rotate;
+            broadcaster.OnSelectSlot += SelectSlot;
 
             listener.OnDisconnect += Disconnect;
         }
@@ -45,14 +53,56 @@ namespace MultiplayerServer.Game
             _players.RemoveAll(x => x.Peer == peer);
         }
 
+        private void FinishGame_(object peer, FinishGame packet)
+        {
+            foreach (var player in _players)
+            {
+                player.InAssembly = false;
+                player.IsInfected = false;
+                player.IsKilled = false;
+                player.Position = Vector3.Zero;
+                player.Rotation = Vector3.Zero;
+            }
+        }
+
         private byte GetMaxPlayers()
         {
             return byte.Parse(configuration["MaxPlayers"]);
         }
 
-        private Player GetPlayer(int globalID)
+        private Player GetPlayer(byte globalID)
         {
             return _players.FirstOrDefault(x => x.GlobalID == globalID);
+        }
+
+        private void InAssembly(object peer, PlayerInAssembly packet)
+        {
+            var player = GetPlayer(packet.GlobalID);
+
+            if (player != null)
+            {
+                player.InAssembly = true;
+            }
+        }
+
+        private void Infect(object peer, PlayerInfected packet)
+        {
+            var player = GetPlayer(packet.GlobalID);
+
+            if (player != null)
+            {
+                player.IsInfected = true;
+            }
+        }
+
+        private void Kill(object peer, PlayerKilled packet)
+        {
+            var player = GetPlayer(packet.GlobalID);
+
+            if (player != null)
+            {
+                player.IsKilled = true;
+            }
         }
 
         private void Login(object peer, LoginRequest packet)
@@ -91,24 +141,21 @@ namespace MultiplayerServer.Game
         private void Move(object peer, Move packet)
         {
             var player = GetPlayer(packet.GlobalID);
-            var newPosition = new Vector3(packet.X, packet.Y, packet.Z);
 
-            if (player.Position.Equals(newPosition))
+            if (player != null)
             {
-                return;
+                player.Position = new Vector3(packet.X, packet.Y, packet.Z);
             }
+        }
 
-            player.Position = newPosition;
+        private void OutAssembly(object peer, PlayerOutOfAssembly packet)
+        {
+            var player = GetPlayer(packet.GlobalID);
 
-            var movePacket = new Move
+            if (player != null)
             {
-                GlobalID = player.GlobalID,
-                X = player.Position.X,
-                Y = player.Position.Y,
-                Z = player.Position.Z,
-            };
-
-            sender.Broadcast(peer as NetPeer, movePacket);
+                player.InAssembly = false;
+            }
         }
 
         private void PlayerJoined(object peer, Player player)
@@ -119,6 +166,51 @@ namespace MultiplayerServer.Game
             };
 
             sender.Broadcast(peer as NetPeer, packet);
+        }
+
+        private void Poisoned(object peer, PlayerPoisoned packet)
+        {
+            var player = GetPlayer(packet.GlobalID);
+
+            if (player != null)
+            {
+                player.IsPoisoned = true;
+            }
+        }
+
+        private void Rotate(object peer, Rotate packet)
+        {
+            var player = GetPlayer(packet.GlobalID);
+
+            if (player != null)
+            {
+                player.Rotation = new Vector3(packet.X, packet.Y, packet.Z);
+            }
+        }
+
+        private void SelectSlot(object peer, SelectSlotRequest packet)
+        {
+            var player = GetPlayer(packet.GlobalID);
+
+            if (player == null)
+            {
+                return;
+            }
+
+            if (_players.Any(x => x.Slot == packet.Slot))
+            {
+                throw new GameException("Slot already selected.", peer as NetPeer);
+            }
+
+            player.Slot = packet.Slot;
+
+            var packetResponse = new SelectSlotResponse
+            {
+                Slot = player.Slot,
+                Success = true,
+            };
+
+            sender.Send(player.Peer, packetResponse);
         }
 
         private void SendServerFull(object peer)

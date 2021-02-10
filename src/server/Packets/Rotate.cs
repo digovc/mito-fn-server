@@ -1,20 +1,23 @@
-﻿using System.Numerics;
-
-namespace MultiplayerServer.Models
+﻿namespace Packets
 {
-    public class Entity
+    public class Rotate
     {
         public byte GlobalID
         {
             get; set;
         }
 
-        public Vector3 Position
+        public float X
         {
             get; set;
         }
 
-        public Vector3 Rotation
+        public float Y
+        {
+            get; set;
+        }
+
+        public float Z
         {
             get; set;
         }
