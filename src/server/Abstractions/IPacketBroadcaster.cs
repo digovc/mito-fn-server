@@ -30,6 +30,10 @@ namespace MultiplayerServer.Abstractions
 
         void SelectSlot(SelectSlotRequest packet, NetPeer peer);
 
+        void SlotSelected(SlotSelected packet, NetPeer peer);
+
+        void SlotsRequest(SlotsRequest packet, NetPeer peer);
+
         void SpawnStage(SpawnStage packet, NetPeer peer);
 
         void StartGame(StartGame packet, NetPeer peer);
@@ -67,6 +71,10 @@ namespace MultiplayerServer.Abstractions
         event EventHandler<Rotate> OnRotate;
 
         event EventHandler<SelectSlotRequest> OnSelectSlot;
+
+        event EventHandler<SlotSelected> OnSlotSelected;
+
+        event EventHandler<SlotsRequest> OnSlotsRequest;
 
         event EventHandler<SpawnStage> OnSpawnStage;
 

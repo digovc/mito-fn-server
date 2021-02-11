@@ -47,8 +47,20 @@ namespace MultiplayerServer.Game
             broadcaster.OnPlayerPoisoned += Poisoned;
             broadcaster.OnRotate += Rotate;
             broadcaster.OnSelectSlot += SelectSlot;
+            broadcaster.OnSlotsRequest += SlotsRequest;
 
             listener.OnDisconnect += Disconnect;
+        }
+
+        private void BroadcastSlotSelected(NetPeer peer, Player player)
+        {
+            var packet = new SlotSelected
+            {
+                OwnerGlobalID = player.GlobalID,
+                Slot = player.Slot,
+            };
+
+            sender.Broadcast(peer, packet);
         }
 
         private void Disconnect(object sender, NetPeer peer)
@@ -71,6 +83,11 @@ namespace MultiplayerServer.Game
         private byte GetMaxPlayers()
         {
             return byte.Parse(configuration["MaxPlayers"]);
+        }
+
+        private string[] GetOccupiedSlots()
+        {
+            return _players.Where(x => x.Slot != null).Select(x => x.Slot).ToArray();
         }
 
         private Player GetPlayer(byte globalID)
@@ -133,9 +150,12 @@ namespace MultiplayerServer.Game
 
         private void LoginResponse(object peer, Player player)
         {
+            var occupiedSlots = GetOccupiedSlots();
+
             var packet = new LoginResponse
             {
                 GlobalID = player.GlobalID,
+                OccupiedSlots = occupiedSlots,
             };
 
             sender.Send(peer as NetPeer, packet);
@@ -214,6 +234,7 @@ namespace MultiplayerServer.Game
             };
 
             sender.Send(player.Peer, packetResponse);
+            BroadcastSlotSelected(peer as NetPeer, player);
         }
 
         private void SendServerFull(object peer)
@@ -225,6 +246,20 @@ namespace MultiplayerServer.Game
             };
 
             sender.Send(peer as NetPeer, error);
+        }
+
+        private void SlotsRequest(object peer, SlotsRequest packet)
+        {
+            var player = GetPlayer(packet.GlobalID);
+            var occupiedSlots = GetOccupiedSlots();
+
+            var responsePacket = new SlotsResponse
+            {
+                MySlot = player.Slot,
+                OccupiedSlots = occupiedSlots,
+            };
+
+            sender.Send(peer as NetPeer, responsePacket);
         }
     }
 }

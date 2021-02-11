@@ -1,8 +1,8 @@
 ﻿namespace Packets
 {
-    public class LoginResponse
+    public class SlotsResponse
     {
-        public byte GlobalID
+        public string MySlot
         {
             get; set;
         }

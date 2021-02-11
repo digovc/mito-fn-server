@@ -32,6 +32,7 @@ namespace MultiplayerServer.Services
             _processor.SubscribeReusable<PlayerPoisoned, NetPeer>(broadcaster.PlayerPoisoned);
             _processor.SubscribeReusable<Rotate, NetPeer>(broadcaster.Rotate);
             _processor.SubscribeReusable<SelectSlotRequest, NetPeer>(broadcaster.SelectSlot);
+            _processor.SubscribeReusable<SlotsRequest, NetPeer>(broadcaster.SlotsRequest);
             _processor.SubscribeReusable<SpawnStage, NetPeer>(broadcaster.SpawnStage);
             _processor.SubscribeReusable<StartGame, NetPeer>(broadcaster.StartGame);
             _processor.SubscribeReusable<TaskAddCount, NetPeer>(broadcaster.TaskAddCount);

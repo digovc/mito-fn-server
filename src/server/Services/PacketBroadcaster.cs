@@ -46,6 +46,10 @@ namespace MultiplayerServer.Services
 
         void IPacketBroadcaster.SelectSlot(SelectSlotRequest packet, NetPeer peer) => CallEvent(packet, peer, OnSelectSlot);
 
+        void IPacketBroadcaster.SlotSelected(SlotSelected packet, NetPeer peer) => CallEvent(packet, peer, OnSlotSelected);
+
+        void IPacketBroadcaster.SlotsRequest(SlotsRequest packet, NetPeer peer) => CallEvent(packet, peer, OnSlotsRequest);
+
         void IPacketBroadcaster.SpawnStage(SpawnStage packet, NetPeer peer) => CallEvent(packet, peer, OnSpawnStage);
 
         void IPacketBroadcaster.StartGame(StartGame packet, NetPeer peer) => CallEvent(packet, peer, OnStartGame);
@@ -87,7 +91,7 @@ namespace MultiplayerServer.Services
                 Message = ex.message,
             };
 
-            sender = sender ?? provider.GetService<ISender>();
+            sender ??= provider.GetService<ISender>();
             sender.Send(ex.peer, packet);
         }
 
@@ -114,6 +118,10 @@ namespace MultiplayerServer.Services
         public event EventHandler<Rotate> OnRotate;
 
         public event EventHandler<SelectSlotRequest> OnSelectSlot;
+
+        public event EventHandler<SlotSelected> OnSlotSelected;
+
+        public event EventHandler<SlotsRequest> OnSlotsRequest;
 
         public event EventHandler<SpawnStage> OnSpawnStage;
 

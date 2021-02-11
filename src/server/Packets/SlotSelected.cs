@@ -1,13 +1,13 @@
 ﻿namespace Packets
 {
-    public class LoginResponse
+    public class SlotSelected
     {
-        public byte GlobalID
+        public byte OwnerGlobalID
         {
             get; set;
         }
 
-        public string[] OccupiedSlots
+        public string Slot
         {
             get; set;
         }

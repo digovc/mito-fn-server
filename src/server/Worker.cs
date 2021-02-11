@@ -16,7 +16,7 @@ namespace MultiplayerServer
         private readonly IPlayerManager playerManager;
         private readonly IUdpProcessor processor;
         private readonly IUdpServer server;
-        private readonly ISyncManager syncManager;
+        private readonly ISyncronizer syncronizer;
         private List<ITicker> tickers;
 
         public Worker(
@@ -26,7 +26,7 @@ namespace MultiplayerServer
             IPlayerManager playerManager,
             IUdpProcessor processor,
             IUdpServer server,
-            ISyncManager syncManager
+            ISyncronizer syncronizer
             )
         {
             this.gameManager = gameManager;
@@ -35,7 +35,7 @@ namespace MultiplayerServer
             this.playerManager = playerManager;
             this.processor = processor;
             this.server = server;
-            this.syncManager = syncManager;
+            this.syncronizer = syncronizer;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -61,7 +61,7 @@ namespace MultiplayerServer
             processor.Init();
             gameManager.Init();
             playerManager.Init();
-            syncManager.Init();
+            syncronizer.Init();
 
             InitTickers();
         }

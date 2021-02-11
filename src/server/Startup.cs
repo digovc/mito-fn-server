@@ -15,7 +15,7 @@ namespace MultiplayerServer
             services.AddSingleton<IGlobalIDProvider, GlobalIDProvider>();
             services.AddSingleton<IPacketBroadcaster, PacketBroadcaster>();
             services.AddSingleton<IPlayerManager, PlayerManager>();
-            services.AddSingleton<ISyncManager, SyncManager>();
+            services.AddSingleton<ISyncronizer, Syncronizer>();
             services.AddSingleton<IUdpListener, UdpListener>();
             services.AddSingleton<IUdpProcessor, UdpProcessor>();
             services.AddSingleton<IUdpServer, UdpServer>();

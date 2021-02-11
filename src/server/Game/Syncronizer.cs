@@ -3,12 +3,12 @@ using MultiplayerServer.Abstractions;
 
 namespace MultiplayerServer.Game
 {
-    public class SyncManager : ISyncManager
+    public class Syncronizer : ISyncronizer
     {
         private readonly IPacketBroadcaster broadcaster;
         private readonly ISender sender;
 
-        public SyncManager(
+        public Syncronizer(
             IPacketBroadcaster broadcaster,
             ISender sender
             )
@@ -17,7 +17,7 @@ namespace MultiplayerServer.Game
             this.sender = sender;
         }
 
-        void ISyncManager.Init()
+        void ISyncronizer.Init()
         {
             broadcaster.OnCallAssembly += Sync;
             broadcaster.OnFinishGame += Sync;

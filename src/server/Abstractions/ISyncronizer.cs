@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerServer.Abstractions
 {
-    public interface ISyncManager
+    public interface ISyncronizer
     {
         void Init();
     }
