@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MultiplayerServer.Abstractions;
 using Packets;
 using System;
@@ -8,19 +9,63 @@ namespace MultiplayerServer.Services
 {
     public class PacketBroadcaster : IPacketBroadcaster
     {
+        private readonly ILogger<PacketBroadcaster> logger;
         private readonly IServiceProvider provider;
         private ISender sender;
 
-        public PacketBroadcaster(IServiceProvider provider)
+        public PacketBroadcaster(
+            ILogger<PacketBroadcaster> logger,
+            IServiceProvider provider
+            )
         {
+            this.logger = logger;
             this.provider = provider;
         }
 
-        void IPacketBroadcaster.CallAssembly(CallAssembly packet, NetPeer peer)
+        void IPacketBroadcaster.CallAssembly(CallAssembly packet, NetPeer peer) => CallEvent(packet, peer, OnCallAssembly);
+
+        void IPacketBroadcaster.FinishGame(FinishGame packet, NetPeer peer) => CallEvent(packet, peer, OnFinishGame);
+
+        void IPacketBroadcaster.LoadScene(LoadScene packet, NetPeer peer) => CallEvent(packet, peer, OnLoadScene);
+
+        void IPacketBroadcaster.Login(LoginRequest packet, NetPeer peer) => CallEvent(packet, peer, OnLogin);
+
+        void IPacketBroadcaster.Move(Move packet, NetPeer peer) => CallEvent(packet, peer, OnMove);
+
+        void IPacketBroadcaster.PlayerInAssembly(PlayerInAssembly packet, NetPeer peer) => CallEvent(packet, peer, OnPlayerInAssembly);
+
+        void IPacketBroadcaster.PlayerInfected(PlayerInfected packet, NetPeer peer) => CallEvent(packet, peer, OnPlayerInfected);
+
+        void IPacketBroadcaster.PlayerKilled(PlayerKilled packet, NetPeer peer) => CallEvent(packet, peer, OnPlayerKilled);
+
+        void IPacketBroadcaster.PlayerOutOfAssembly(PlayerOutOfAssembly packet, NetPeer peer) => CallEvent(packet, peer, OnPlayerOutOfAssembly);
+
+        void IPacketBroadcaster.PlayerPoisoned(PlayerPoisoned packet, NetPeer peer) => CallEvent(packet, peer, OnPlayerPoisoned);
+
+        void IPacketBroadcaster.Rotate(Rotate packet, NetPeer peer) => CallEvent(packet, peer, OnRotate);
+
+        void IPacketBroadcaster.SelectSlot(SelectSlotRequest packet, NetPeer peer) => CallEvent(packet, peer, OnSelectSlot);
+
+        void IPacketBroadcaster.SpawnStage(SpawnStage packet, NetPeer peer) => CallEvent(packet, peer, OnSpawnStage);
+
+        void IPacketBroadcaster.StartGame(StartGame packet, NetPeer peer) => CallEvent(packet, peer, OnStartGame);
+
+        void IPacketBroadcaster.TaskAddCount(TaskAddCount packet, NetPeer peer) => CallEvent(packet, peer, OnTaskAddCount);
+
+        void IPacketBroadcaster.TaskComplete(TaskComplete packet, NetPeer peer) => CallEvent(packet, peer, OnTaskComplete);
+
+        void IPacketBroadcaster.TaskEnableZone(TaskEnableZone packet, NetPeer peer) => CallEvent(packet, peer, OnTaskEnableZone);
+
+        void IPacketBroadcaster.TaskMakeActivable(TaskMakeActivable packet, NetPeer peer) => CallEvent(packet, peer, OnTaskMakeActivable);
+
+        void IPacketBroadcaster.Vote(Vote packet, NetPeer peer) => CallEvent(packet, peer, OnVote);
+
+        private void CallEvent<T>(T packet, NetPeer peer, EventHandler<T> @event)
         {
             try
             {
-                OnCallAssembly?.Invoke(peer, packet);
+                Log(packet.GetType(), peer);
+                @event?.Invoke(peer, packet);
             }
             catch (GameException ex)
             {
@@ -28,220 +73,10 @@ namespace MultiplayerServer.Services
             }
         }
 
-        void IPacketBroadcaster.FinishGame(FinishGame packet, NetPeer peer)
+        private void Log(Type type, NetPeer peer)
         {
-            try
-            {
-                OnFinishGame?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.LoadScene(LoadScene packet, NetPeer peer)
-        {
-            try
-            {
-                OnLoadScene?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.Login(LoginRequest packet, NetPeer peer)
-        {
-            try
-            {
-                OnLogin?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.Move(Move packet, NetPeer peer)
-        {
-            try
-            {
-                OnMove?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.PlayerInAssembly(PlayerInAssembly packet, NetPeer peer)
-        {
-            try
-            {
-                OnPlayerInAssembly?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.PlayerInfected(PlayerInfected packet, NetPeer peer)
-        {
-            try
-            {
-                OnPlayerInfected?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.PlayerKilled(PlayerKilled packet, NetPeer peer)
-        {
-            try
-            {
-                OnPlayerKilled?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.PlayerOutOfAssembly(PlayerOutOfAssembly packet, NetPeer peer)
-        {
-            try
-            {
-                OnPlayerOutOfAssembly?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.PlayerPoisoned(PlayerPoisoned packet, NetPeer peer)
-        {
-            try
-            {
-                OnPlayerPoisoned?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.Rotate(Rotate packet, NetPeer peer)
-        {
-            try
-            {
-                OnRotate?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.SelectSlot(SelectSlotRequest packet, NetPeer peer)
-        {
-            try
-            {
-                OnSelectSlot?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.SpawnStage(SpawnStage packet, NetPeer peer)
-        {
-            try
-            {
-                OnSpawnStage?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.StartGame(StartGame packet, NetPeer peer)
-        {
-            try
-            {
-                OnStartGame?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.TaskAddCount(TaskAddCount packet, NetPeer peer)
-        {
-            try
-            {
-                OnTaskAddCount?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.TaskComplete(TaskComplete packet, NetPeer peer)
-        {
-            try
-            {
-                OnTaskComplete?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.TaskEnableZone(TaskEnableZone packet, NetPeer peer)
-        {
-            try
-            {
-                OnTaskEnableZone?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.TaskMakeActivable(TaskMakeActivable packet, NetPeer peer)
-        {
-            try
-            {
-                OnTaskMakeActivable?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
-        }
-
-        void IPacketBroadcaster.Vote(Vote packet, NetPeer peer)
-        {
-            try
-            {
-                OnVote?.Invoke(peer, packet);
-            }
-            catch (GameException ex)
-            {
-                SendError(ex);
-            }
+            var log = string.Format("Packet '{0}' received from peer '{1}'.", type.Name, peer.Id);
+            logger.LogInformation(log);
         }
 
         private void SendError(GameException ex)

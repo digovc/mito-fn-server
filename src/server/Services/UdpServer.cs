@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using MultiplayerServer.Abstractions;
+using System;
 using System.Collections.Generic;
 
 namespace MultiplayerServer.Services
@@ -24,6 +25,7 @@ namespace MultiplayerServer.Services
             var netListener = listener.GetListener();
 
             _server = new NetManager(netListener);
+            _server.DisconnectTimeout = (int)TimeSpan.FromSeconds(45).TotalMilliseconds;
             _server.Start(9876);
         }
 
