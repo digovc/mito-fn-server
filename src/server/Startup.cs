@@ -12,6 +12,7 @@ namespace MultiplayerServer
             services.AddHostedService<Worker>();
 
             services.AddSingleton<IGameManager, GameManager>();
+            services.AddSingleton<IGlobalIDProvider, GlobalIDProvider>();
             services.AddSingleton<IPacketBroadcaster, PacketBroadcaster>();
             services.AddSingleton<IPlayerManager, PlayerManager>();
             services.AddSingleton<ISyncManager, SyncManager>();

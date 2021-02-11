@@ -13,6 +13,7 @@ namespace MultiplayerServer.Game
     {
         private readonly IPacketBroadcaster broadcaster;
         private readonly IConfiguration configuration;
+        private readonly IGlobalIDProvider globalIDProvider;
         private readonly IUdpListener listener;
         private readonly ISender sender;
         private List<Player> _players;
@@ -20,12 +21,14 @@ namespace MultiplayerServer.Game
         public PlayerManager(
             IPacketBroadcaster broadcaster,
             IConfiguration configuration,
+            IGlobalIDProvider globalIDProvider,
             IUdpListener listener,
             ISender sender
             )
         {
             this.broadcaster = broadcaster;
             this.configuration = configuration;
+            this.globalIDProvider = globalIDProvider;
             this.listener = listener;
             this.sender = sender;
         }
@@ -113,7 +116,7 @@ namespace MultiplayerServer.Game
                 return;
             }
 
-            var globalID = (byte)(_players.Count + 1);
+            var globalID = globalIDProvider.GetNextID();
 
             var player = new Player
             {
