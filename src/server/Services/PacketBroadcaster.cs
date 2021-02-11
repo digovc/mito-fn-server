@@ -64,7 +64,7 @@ namespace MultiplayerServer.Services
         {
             try
             {
-                Log(packet.GetType(), peer);
+                LogPacket(packet.GetType(), peer);
                 @event?.Invoke(peer, packet);
             }
             catch (GameException ex)
@@ -73,7 +73,7 @@ namespace MultiplayerServer.Services
             }
         }
 
-        private void Log(Type type, NetPeer peer)
+        private void LogPacket(Type type, NetPeer peer)
         {
             var log = string.Format("Packet '{0}' received from peer '{1}'.", type.Name, peer.Id);
             logger.LogInformation(log);
