@@ -19,6 +19,11 @@ namespace MultiplayerServer.Models
             get; set;
         }
 
+        public bool IsMaster
+        {
+            get; set;
+        }
+
         public bool IsPoisoned
         {
             get; set;

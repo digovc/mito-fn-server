@@ -17,6 +17,7 @@ namespace MultiplayerServer.Game
         private readonly IUdpListener listener;
         private readonly ISender sender;
         private List<Player> _players;
+        private bool isMasterPresent = false;
 
         public PlayerManager(
             IPacketBroadcaster broadcaster,
@@ -65,6 +66,13 @@ namespace MultiplayerServer.Game
 
         private void Disconnect(object sender, NetPeer peer)
         {
+            var player = GetPlayer(peer);
+
+            if (player.IsMaster)
+            {
+                isMasterPresent = false;
+            }
+
             _players.RemoveAll(x => x.Peer == peer);
         }
 
@@ -93,6 +101,11 @@ namespace MultiplayerServer.Game
         private Player GetPlayer(byte globalID)
         {
             return _players.FirstOrDefault(x => x.GlobalID == globalID);
+        }
+
+        private Player GetPlayer(NetPeer peer)
+        {
+            return _players.FirstOrDefault(x => x.Peer == peer);
         }
 
         private void InAssembly(object peer, PlayerInAssembly packet)
@@ -151,10 +164,19 @@ namespace MultiplayerServer.Game
         private void LoginResponse(object peer, Player player)
         {
             var occupiedSlots = GetOccupiedSlots();
+            var isMaster = false;
+
+            if (!isMasterPresent)
+            {
+                isMasterPresent = true;
+                isMaster = true;
+                player.IsMaster = true;
+            }
 
             var packet = new LoginResponse
             {
                 GlobalID = player.GlobalID,
+                IsMaster = isMaster,
                 OccupiedSlots = occupiedSlots,
             };
 

@@ -7,6 +7,11 @@
             get; set;
         }
 
+        public bool IsMaster
+        {
+            get; set;
+        }
+
         public string[] OccupiedSlots
         {
             get; set;
