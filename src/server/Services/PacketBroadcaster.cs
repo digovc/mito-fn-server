@@ -32,6 +32,8 @@ namespace MultiplayerServer.Services
 
         void IPacketBroadcaster.Move(Move packet, NetPeer peer) => CallEvent(packet, peer, OnMove);
 
+        void IPacketBroadcaster.PlayerDisconnected(PlayerDisconnected packet, NetPeer peer) => CallEvent(packet, peer, OnPlayerDisconnected);
+
         void IPacketBroadcaster.PlayerInAssembly(PlayerInAssembly packet, NetPeer peer) => CallEvent(packet, peer, OnPlayerInAssembly);
 
         void IPacketBroadcaster.PlayerInfected(PlayerInfected packet, NetPeer peer) => CallEvent(packet, peer, OnPlayerInfected);
@@ -104,6 +106,8 @@ namespace MultiplayerServer.Services
         public event EventHandler<LoginRequest> OnLogin;
 
         public event EventHandler<Move> OnMove;
+
+        public event EventHandler<PlayerDisconnected> OnPlayerDisconnected;
 
         public event EventHandler<PlayerInAssembly> OnPlayerInAssembly;
 

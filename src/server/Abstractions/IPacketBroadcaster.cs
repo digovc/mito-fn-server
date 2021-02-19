@@ -16,6 +16,8 @@ namespace MultiplayerServer.Abstractions
 
         void Move(Move packet, NetPeer peer);
 
+        void PlayerDisconnected(PlayerDisconnected packet, NetPeer peer);
+
         void PlayerInAssembly(PlayerInAssembly packet, NetPeer peer);
 
         void PlayerInfected(PlayerInfected packet, NetPeer peer);
@@ -57,6 +59,8 @@ namespace MultiplayerServer.Abstractions
         event EventHandler<LoginRequest> OnLogin;
 
         event EventHandler<Move> OnMove;
+
+        event EventHandler<PlayerDisconnected> OnPlayerDisconnected;
 
         event EventHandler<PlayerInAssembly> OnPlayerInAssembly;
 

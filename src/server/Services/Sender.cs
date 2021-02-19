@@ -12,7 +12,7 @@ namespace MultiplayerServer.Services
 
         public Sender(
             ILogger<Sender> logger,
-            IUdpProcessor processor, 
+            IUdpProcessor processor,
             IUdpServer server
             )
         {

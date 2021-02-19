@@ -74,6 +74,13 @@ namespace MultiplayerServer.Game
             }
 
             _players.RemoveAll(x => x.Peer == peer);
+
+            var packet = new PlayerDisconnected
+            {
+                GlobalID = player.GlobalID,
+            };
+
+            this.sender.Broadcast(peer, packet);
         }
 
         private void FinishGame_(object peer, FinishGame packet)
