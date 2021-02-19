@@ -16,5 +16,10 @@
         {
             get; set;
         }
+
+        public byte[] OccupiedSlotsIDs
+        {
+            get; set;
+        }
     }
 }

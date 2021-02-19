@@ -98,6 +98,11 @@ namespace MultiplayerServer.Game
             return _players.Where(x => x.Slot != null).Select(x => x.Slot).ToArray();
         }
 
+        private byte[] GetOccupiedSlotsIDs()
+        {
+            return _players.Where(x => x.Slot != null).Select(x => x.GlobalID).ToArray();
+        }
+
         private Player GetPlayer(byte globalID)
         {
             return _players.FirstOrDefault(x => x.GlobalID == globalID);
@@ -164,6 +169,7 @@ namespace MultiplayerServer.Game
         private void LoginResponse(object peer, Player player)
         {
             var occupiedSlots = GetOccupiedSlots();
+            var occupiedSlotsIDs = GetOccupiedSlotsIDs();
             var isMaster = false;
 
             if (!isMasterPresent)
@@ -178,6 +184,7 @@ namespace MultiplayerServer.Game
                 GlobalID = player.GlobalID,
                 IsMaster = isMaster,
                 OccupiedSlots = occupiedSlots,
+                OccupiedSlotsIDs = occupiedSlotsIDs,
             };
 
             sender.Send(peer as NetPeer, packet);
@@ -274,11 +281,13 @@ namespace MultiplayerServer.Game
         {
             var player = GetPlayer(packet.GlobalID);
             var occupiedSlots = GetOccupiedSlots();
+            var occupiedSlotsIDs = GetOccupiedSlotsIDs();
 
             var responsePacket = new SlotsResponse
             {
                 MySlot = player.Slot,
                 OccupiedSlots = occupiedSlots,
+                OccupiedSlotsIDs = occupiedSlotsIDs,
             };
 
             sender.Send(peer as NetPeer, responsePacket);
